@@ -1,6 +1,6 @@
-# MonOS
-Micro-IntOS (or mu-IntOS) i
- 
+# MonoOS
+A monolithic OS.
+
 ## Run
 You have to build the `printer` and computer `executables` separately as shown below:
 
@@ -30,7 +30,7 @@ You have to build the `printer` and computer `executables` separately as shown b
 
 ````
     .
-    └── micro-IntOS/
+    └── MonoOS/
         ├── computer.cpp
         ├── load.cpp
         ├── print.cpp

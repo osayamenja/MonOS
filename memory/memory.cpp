@@ -16,7 +16,7 @@ std::vector<int> Mem;
 void mem_init(int M){
     Mem = std::vector<int>(M);
 }
-void mem_read(){
+void mem_read(){ // point of entry for MMU
     registers.MBR = Mem.at(registers.MAR);
 }
 void mem_write(){
