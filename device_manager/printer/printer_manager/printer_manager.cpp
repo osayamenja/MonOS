@@ -8,7 +8,7 @@
 #include <mutex>
 #include <thread>
 #include "printer_manager.h"
-#include "../../connector/server_connector.h"
+#include "../../../connector/server_connector.h"
 #include "../printer.h"
 #include "../communicator/communicator.h"
 

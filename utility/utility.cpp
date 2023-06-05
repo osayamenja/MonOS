@@ -7,7 +7,10 @@
 #include <string>
 #include <tuple>
 #include <sys/socket.h>
-#include <cstdint>
+#include <sstream>
+#include <iomanip>
+#include <cstring>
+#include <vector>
 
 #include "utility.h"
 
@@ -66,5 +69,38 @@ size_t readAll(int fd, int *output_buf)
     }
     *output_buf = ntohl(output_int);
     return sizeof(output_int);
+}
+
+std::string get_indented_str(const std::string& str, int indent){
+    std::stringstream dump_stream;
+    dump_stream << std::setw(indent) << str << std::endl;
+    return dump_stream.str();
+}
+
+std::vector<int> separate_spaced_str(char str[]){
+    char *word = strtok(str, " ");
+    std::vector<int>a;
+    while(word != nullptr && strcmp(word, "\n") != 0){
+        a.push_back(std::stoi(word));
+        word = strtok(nullptr, " ");
+    }
+    return a;
+}
+
+PrinterOp getPrinterOp(int i){
+    switch(i){
+        case 0:
+            return INIT_SPOOL;
+        case 1:
+            return END_SPOOL;
+        case 2:
+            return PRINT;
+        case 3:
+            return DUMP_SPOOL;
+        case 4:
+            return TERMINATE;
+        default:
+            return NOOP;
+    }
 }
 

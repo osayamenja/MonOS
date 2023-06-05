@@ -8,10 +8,9 @@
 #include <string>
 #include <tuple>
 
-#include "memory/load.h"
+#include "memory/loader/load.h"
 #include "utility/utility.h"
 #include "memory/memory.h"
-#include "computer_utility/computer_utility.h"
 
 int populate_memory(char str[], int index){
     char *word = strtok(str, " ");

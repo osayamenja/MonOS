@@ -21,6 +21,7 @@ bool terminateFlag;
 std::string ip_addr;
 int port;
 int CID;
+int WS;
 
 void read_system_parameters(){
     char fname[20] = "config.txt";
