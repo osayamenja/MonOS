@@ -52,18 +52,23 @@ You have to build the `printer` and computer `executables` separately as shown b
         ├── cpu/
         │   ├── cpu.cpp
         │   └── cpu.h
+        ├── device_manager/
+        │   └── printer/
+        │       ├── printer.h
+        │       ├── communicator/
+        │       │   ├── communicator.cpp
+        │       │   └── communicator.h
+        │       ├── printer_manager/
+        │       │   ├── printer_manager.cpp
+        │       │   └── printer_manager.h
+        │       └── printer_utility/
+        │           ├── printer_utility.cpp
+        │           └── printer_utility.h
+        │   
         ├── memory/
         │   ├── load.h
         │   ├── memory.cpp
         │   └── memory.h
-        ├── printer/
-        │   ├── communicator/
-        │   │   ├── communicator.cpp
-        │   │   │── communicator.h
-        │   ├── printer_manager/
-        │   │   ├── printer_manager.cpp
-        │   │   └── printer_manager.h
-        │   └── printer.h
         ├── printer_utility/
         │   ├── printer_utility.cpp
         │   └── printer_utility.h

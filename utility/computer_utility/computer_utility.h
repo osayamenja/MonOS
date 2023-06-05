@@ -7,7 +7,6 @@
 
 
 void display_process_continuation_msg(int pid, int base);
-std::vector<int> separate_spaced_str(char str[]);
 
 
 #endif //AIMUYO_OS_PROJECT_2_COMPUTER_UTILITY_H

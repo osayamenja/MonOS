@@ -44,7 +44,7 @@ void cpu_fetch_instruction(){
     registers.IR1 = registers.MBR;
 }
 
-int cpu_mem_address(int m_addr){
+int cpu_mem_address(int m_addr){ // get page number
     return registers.Base + m_addr;
 }
 

@@ -8,8 +8,8 @@
 #include <string>
 #include <semaphore.h>
 #include <vector>
-#include "../computer/print.h"
-#include "../utility/utility.h"
+#include "../../computer/print.h"
+#include "../../utility/utility.h"
 
 extern sem_t sync_pc;
 

@@ -6,7 +6,7 @@
 #define AIMUYO_OS_PROJECT_SCHEDULER_H
 
 #include "../computer/computer.h"
-#include "../memory/load.h"
+#include "../memory/loader/load.h"
 
 extern int current_mem_instr_time;
 extern MemoryMetadata current_process_metadata;

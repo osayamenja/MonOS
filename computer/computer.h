@@ -9,7 +9,7 @@
 #include <cstdio>
 #include <mutex>
 #include "../cpu/cpu.h"
-#include "../memory/load.h"
+#include "../memory/loader/load.h"
 
 extern bool terminateFlag;
 

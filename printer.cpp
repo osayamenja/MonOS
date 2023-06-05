@@ -11,10 +11,10 @@
 #include <iostream>
 
 #include "utility/utility.h"
-#include "printer/printer.h"
-#include "printer/communicator/communicator.h"
-#include "printer/printer_manager/printer_manager.h"
-#include "printer_utility/printer_utility.h"
+#include "device_manager/printer/printer.h"
+#include "device_manager/printer/communicator/communicator.h"
+#include "device_manager/printer/printer_manager/printer_manager.h"
+#include "utility/file_utility/file_utility.h"
 
 std::string paper_name = "printer.out";
 std::unordered_map<int, std::unordered_set<int>> spool_files; // CID -> set of its processes.

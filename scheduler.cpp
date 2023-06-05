@@ -13,7 +13,7 @@
 #include "utility/utility.h"
 #include "scheduler/queue.h"
 #include "scheduler/scheduler.h"
-#include "computer_utility/computer_utility.h"
+#include "utility/computer_utility/computer_utility.h"
 
 std::unordered_map<int, PCB> PCBs;
 int initial_PID;
