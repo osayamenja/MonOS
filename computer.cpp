@@ -59,6 +59,7 @@ int main(int argc, char* argv[]) {
     std::thread::id main_id = std::this_thread::get_id();
     boot_system(argv[1]);
 
+    load_init();
     mem_init(memorySize);
     process_scheduler_init();
 

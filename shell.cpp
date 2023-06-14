@@ -49,10 +49,15 @@ void shell_command(int cmd){
             atomically_print_to_stdout("Input Program File and Base>");
             std::cin >> prog_file_name;
             std::cin >> base;
-            m = load_prog(const_cast<char*>(prog_file_name.c_str()), base);
-            process_submit(prog_file_name, base, m);
-            atomically_print_to_stdout("Submitted {fname->"
-                                    + prog_file_name + ", " + std::to_string(base) + "}");
+            m = load_prog(const_cast<char*>(prog_file_name.c_str()));
+            if(!m.isOutOfMemory){
+                process_submit(prog_file_name, base, m);
+                atomically_print_to_stdout("Submitted {fname->"
+                                           + prog_file_name + ", " + std::to_string(base) + "}");
+            }
+            else{
+                atomically_print_to_stdout("OutOfMemory: Release memory and retry");
+            }
             break;
         case 2:
             shell_print_registers();

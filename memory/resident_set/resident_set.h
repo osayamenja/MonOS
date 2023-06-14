@@ -14,7 +14,8 @@ struct Page{
 };
 
 void resident_set_init(int WS);
-Page check(int page_no);
+Page resident_set_check(int page_no);
+void resident_set_write(int page_no, int offset, int data);
 void display();
 
 

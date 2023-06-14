@@ -115,7 +115,7 @@ void process_scheduler_init() {
 
     // load idle program
     std::string idle_fname = "prog-idle.txt";
-    MemoryMetadata m = load_prog(const_cast<char*>(idle_fname.c_str()), 0);
+    MemoryMetadata m = load_prog(const_cast<char*>(idle_fname.c_str()));
 
     idle_prog = PCB();
     idle_prog.PID = idle_prog_PID;
@@ -224,4 +224,8 @@ void scheduler_terminate(){
     atomically_print_to_stdout("Terminating scheduler...");
     PCBs.clear();
     print_terminate();
+}
+
+PCB get_running_PCB(){
+    return running_pcb;
 }

@@ -32,7 +32,7 @@ void append_file(std::FILE* from, std::FILE* append_to, const std::string& adden
 
 }
 
-bool exists(std::string& file){ // use the file status library to check the existence of a file.
+bool exists(std::string& file){ // use the file status library to resident_set_check the existence of a file.
     struct stat file_info{};
     return !stat(file.c_str(), &file_info);
 }

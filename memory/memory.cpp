@@ -11,16 +11,37 @@
 #include "../scheduler/scheduler.h"
 #include "../utility/utility.h"
 #include "memory.h"
+#include "resident_set/resident_set.h"
 
 std::vector<int> Mem;
 void mem_init(int M){
     Mem = std::vector<int>(M);
+    resident_set_init(WS);
 }
-void mem_read(){ // point of entry for MMU
-    registers.MBR = Mem.at(registers.MAR);
+
+int get_frame_number(int virtual_address){
+    return virtual_address / pageSize;
 }
+
+int get_page_offset(int virtual_address){
+    return virtual_address % pageSize;
+}
+
+int get_page_number(int virtual_address){
+    return get_running_PCB().metadata.page_table.at(get_frame_number(virtual_address));
+}
+
+int get_physical_address(int page_no, int offset){
+    return (page_no * pageSize) + offset;
+}
+
+void mem_read(){
+    Page p = resident_set_check(get_page_number(registers.MAR));
+    registers.MBR = p.data.at(get_page_offset(registers.MAR));
+}
+
 void mem_write(){
-    Mem.at(registers.MAR)= registers.MBR;
+    resident_set_write(get_page_number(registers.MAR), registers.MAR, registers.MBR);
 }
 
 void mem_dump_memory(){

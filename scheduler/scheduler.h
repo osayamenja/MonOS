@@ -27,6 +27,7 @@ void process_submit(std::string fname, int base, MemoryMetadata m);
 void process_execute();
 void process_exit(int pid);
 void scheduler_terminate();
+PCB get_running_PCB();
 
 void process_set_mem_metadata(MemoryMetadata &m);
 
