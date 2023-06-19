@@ -46,6 +46,9 @@ void read_system_parameters(){
         std::tie(std::ignore, line) = get_line(config_file);
         TQ = std::stoi(line); // obtains time quantum from config.sys file.
         mem_delay = TQ;
+
+        std::tie(std::ignore, line) = get_line(config_file);
+        WS = std::stoi(line); // obtains working set size from config.sys file.
     }
 }
 

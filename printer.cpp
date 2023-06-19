@@ -23,8 +23,8 @@ std::deque<PrinterOpDetails> printer_ops;
 
 int NC;
 int MQS;
-/*std::string ip_addr;*/
-/*int port;*/
+std::string ip_addr;
+int port;
 int CQS;
 int PT;
 bool printer_terminate_flag;
@@ -248,7 +248,7 @@ void load_printer_parameters(int skip){
         port = std::stoi(line); // obtains printer's port from config.sys file.
 
         for(int i = 0; i < skip; ++i){
-            get_line(config_file); // skip M, TQ
+            get_line(config_file); // skip M, TQ, WS
         }
 
         std::tie(std::ignore, line) = get_line(config_file);
@@ -266,9 +266,9 @@ void load_printer_parameters(int skip){
 }
 
 
-/*int main(){
-    load_printer_parameters(2);
+int main(){
+    load_printer_parameters(3);
     printer_manager(NC, CQS, MQS);
     return 0;
-}*/
+}
 

@@ -1,32 +1,37 @@
 # MonoOS
-A monolithic OS.
+A monolithic OS with MLFQ scheduling, memory manager supporting on-demand paging and 
+a device manager supporting network devices. 
+
+MonoOS also features a simulated CPU which executes user programs written as specified in  
+
+### Note
+Given that this is still an in-progress project, documentation will be slightly less than exhaustive.
+
+However, we aim to complete this README as soon as changes are complete for the OS.
+
 
 ## Run
-You have to build the `printer` and computer `executables` separately as shown below:
+You have to execute the printer device first since the computer expects to connect to it.
 
 ### Run printer
   ````
-  make printer
+  ./exec_printer.sh
   ````
 
-  ````
-  ./printer.exe
-  ````
 
 ### Run Computer
+You can run the computer next
   ````
-  make computer
-  ````
-
-  ````
-  ./computer.exe <cid>
+  ./exec_computer.sh
   ````
 
 
 ## File Structure
 - See the below diagram to navigate the directory.
-- The root directory is `Aimuyo_OS_Project`.
+- The root directory is `MonoOS`.
 - The idle program should be in `prog-idle.txt`.
+  This is needed to ensure the CPU maintains operation even when no user processes are available. 
+
 
 ````
     .
@@ -84,43 +89,12 @@ You have to build the `printer` and computer `executables` separately as shown b
     
 ````
 
-## Documentation
-Below are descriptions for the important `.cpp` files that comprise the program.
+## Architecture
 
-- ### scheduler.cpp
-  implements all the functions defined in the handout, with a bonus of using the MLFQ algorithm. 
-  See `Note` above for more details on its operation.
-     
-- ### print.cpp
-  implements all the functions defined in the handout. 
-  It receives a print_ACK after each interaction with `printer.cpp`.
+### COMING SOON...
 
-- ### printer.cpp
-  implements all the functions defined in the handout as a forked process. 
-  It sends n print_ACK after each interaction with `print.cpp`.
 
-- ### shell.cpp
-  implements all the functions defined in the handout as a separate thread.
-
-- ### cpu.cpp
-  defines `cpu_operation()`, `cpu_fetch_instruction()`, `cpu_execute_instruction()`
-  for cpu operations, fetching, and executing instructions, respectively.
-  Also defines `cpu_mem_address(int m_addr)` for computing a true memory address, given `m_addr`
-  and `cpu_dump_registers()` for dumping registers.
-
-- ### memory.cpp
-  defines `mem_init(int M)`, `mem_read()`, `mem_write()` and `mem_dump_memory()` for initializing, 
-  reading from, writing to, and dumping the contents of memory, respectively.
-
-- ### load.cpp
-  defines `load_prog(char *fname, int base)` for loading instructions from file `fname` to
-  memory address starting at `base`. Also, defines `load_finish(std::FILE *f)` which closes the opened program file.
-
-- ### computer.cpp
-  defines `main()` for starting the Operating System. Also defines `boot_system()` 
-  for retrieving system configurations from `config.sys`. 
-
-## Note
+## MLFQ Scheduling
 The scheduler uses a Multi-Level Feedback Queue (MLFQ) set to four levels
 as defined in `rq_levels` found in `scheduler.cpp`.
 Feel free to change this value to a reasonable (>1) positive integer.

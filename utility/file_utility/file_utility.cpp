@@ -19,13 +19,7 @@ void append_file(std::FILE* from, std::FILE* append_to){
 }
 
 void append_file(std::FILE* from, std::FILE* append_to, const std::string& addendum){
-    int c = fgetc(from);
-    if (c == EOF) return;
-    while(c != EOF){
-        fputc(c, append_to);
-        c = fgetc(from);
-        if (c == '\n') usleep(PT); // sleep before writing new line
-    }
+    append_file(from, append_to);
     usleep(PT); // sleep before adding addendum.
     fputs(addendum.c_str(), append_to);
     putc('\n', append_to);

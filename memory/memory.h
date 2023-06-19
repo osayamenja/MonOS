@@ -17,5 +17,5 @@ int get_frame_number(int virtual_address);
 int get_physical_address(int page_no, int offset);
 void mem_read();
 void mem_write();
-void mem_dump_memory();
+void mem_dump_secondary_memory();
 #endif //AIMUYO_OS_PROJECT_MEMORY_H

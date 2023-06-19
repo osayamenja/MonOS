@@ -26,6 +26,8 @@ ExecutionStatus cpu_operation(int pid){
         registers.PC++;
         TQ_counter++;
     }
+    if (executionStatus == Exit) return executionStatus;
+
     if(TQ_counter == TQ) return TQExpiration;
     else return executionStatus;
 }
@@ -151,7 +153,6 @@ void cpu_dump_registers(){
 
     dump_stream <<"Register: Contents" << std::endl;
     dump_stream << "AC: " << registers.AC << std::endl;
-    dump_stream << "Base: " << registers.Base << std::endl;
     dump_stream << "MAR: " << registers.MAR << std::endl;
     dump_stream << "MBR: " << registers.MBR << std::endl;
     dump_stream << "IR0: " << registers.IR0 << std::endl;

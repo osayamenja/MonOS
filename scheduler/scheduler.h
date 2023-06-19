@@ -13,7 +13,7 @@ extern MemoryMetadata current_process_metadata;
 extern REGS registers;
 
 void process_init_PCBs();
-PCB process_init_PCB(std::string &fname, int Base, MemoryMetadata &metadata);
+PCB process_init_PCB(std::string &fname, MemoryMetadata &metadata);
 void process_dispose_PCB(int pid);
 void process_dump_PCB();
 void process_init_readyQ();
@@ -23,7 +23,7 @@ void process_dump_readyQ();
 void process_context_switch(PCB &currentPCB, PCB &newPCB);
 void process_scheduler_init();
 void process_set_registers(REGS &regs);
-void process_submit(std::string fname, int base, MemoryMetadata m);
+void process_submit(std::string& fname, MemoryMetadata& m);
 void process_execute();
 void process_exit(int pid);
 void scheduler_terminate();

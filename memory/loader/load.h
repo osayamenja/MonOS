@@ -14,14 +14,14 @@ const int pageSize = instruction_width;
 struct MemoryMetadata{
     int instruction_num;
     int data_num;
-    int base;
     bool isOutOfMemory;
     std::vector<int> page_table;
 };
 
 void load_init();
 MemoryMetadata load_prog(char *fname);
+int pages_needed(int instructions, int data);
 void load_finish(std::FILE *f);
-bool populate_memory(char str[]);
+void reclaim_memory(const std::vector<int>& page_table);
 
 #endif //AIMUYO_OS_PROJECT_LOAD_H

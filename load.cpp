@@ -16,28 +16,10 @@
 #include "computer/computer.h"
 
 std::deque<int> free_pages;
-int current_page_no;
 int disk_index;
 
 bool atEndOfPage(int index){
     return index % pageSize == 0;
-}
-
-bool populate_memory(char str[]){
-    bool advanced_page = false;
-    char *word = strtok(str, " ");
-
-    while(word != nullptr && strcmp(word, "\n") != 0){
-        Mem.at(disk_index++) = std::stoi(word); // load instruction into memory.
-        word = strtok(nullptr, " ");
-
-        if(atEndOfPage(disk_index)){
-            current_page_no = free_pages.front();
-            free_pages.pop_front();
-            advanced_page = true;
-        }
-    }
-    return advanced_page;
 }
 
 int pages_needed(int instructions, int data){
@@ -48,6 +30,7 @@ void load_init(){
     for(int i = 0; i < memorySize; ++i)
         free_pages.push_back(i);
 
+    disk_index = get_physical_address(free_pages.front(), 0);
 }
 
 MemoryMetadata load_prog(char *fname){
@@ -72,16 +55,19 @@ MemoryMetadata load_prog(char *fname){
             return m;
         }
 
-        disk_index = free_pages.front();
-        m.page_table.push_back(disk_index);
-        free_pages.pop_front();
-
         std::tie(isEOF, line) = get_line(programFile);
-        current_page_no = disk_index;
         while(!isEOF){
-            if(populate_memory(const_cast<char*>(line.c_str()))){
-                m.page_table.push_back(current_page_no);
+            char *word = strtok(const_cast<char*>(line.c_str()), " ");
+            while(word != nullptr && strcmp(word, "\n") != 0){
+                if(atEndOfPage(disk_index)){
+                    disk_index = get_physical_address(free_pages.front(), 0);
+                    m.page_table.push_back(free_pages.front());
+                    free_pages.pop_front();
+                }
+                Mem.at(disk_index++) = std::stoi(word); // load instruction into memory.
+                word = strtok(nullptr, " ");
             }
+
             std::tie(isEOF, line) = get_line(programFile);
         }
         load_finish(programFile);
@@ -91,4 +77,10 @@ MemoryMetadata load_prog(char *fname){
 
 void load_finish(std::FILE *f){
     fclose(f);
+}
+
+void reclaim_memory(const std::vector<int>& page_table){
+    for(auto i : page_table){
+        free_pages.push_back(i);
+    }
 }

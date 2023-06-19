@@ -37,9 +37,8 @@ void process_init_PCBs(){
     PCBs = std::unordered_map<int, PCB>();
 }
 
-PCB process_init_PCB(std::string &fname, int Base, MemoryMetadata &metadata){
+PCB process_init_PCB(std::string &fname, MemoryMetadata &metadata){
     REGS regs = REGS();
-    regs.Base = Base;
     PCB p = {
         get_and_update_PID(),
         regs,
@@ -63,14 +62,13 @@ void process_dump_PCB(){
     dump_stream << std::setw(17) <<"PCB Dump" << std::endl;
     dump_stream << generate_header();
 
-    dump_stream << "Index: [ Filename:XXXXX, PID:#, BASE:#, PC:#, IR0:#, IR1:#, AC:#, MAR:#, MBR:# ]" << std::endl;
+    dump_stream << "Index: [ Filename:XXXXX, PID:#, PC:#, IR0:#, IR1:#, AC:#, MAR:#, MBR:# ]" << std::endl;
     int i  = 0;
     for(const auto& pcb : PCBs){
         PCB p = pcb.second;
         dump_stream << i << ": [";
         dump_stream << "Filename:" << p.file_name << ", ";
         dump_stream << "PID:" << p.PID << ", ";
-        dump_stream << "BASE:" << p.cpuRegisters.Base << ", ";
         dump_stream << "PC:" << p.cpuRegisters.PC << ", ";
         dump_stream << "IR0:" << p.cpuRegisters.IR0 << ", ";
         dump_stream << "IR1:" << p.cpuRegisters.IR1 << ", ";
@@ -110,7 +108,6 @@ void process_dump_readyQ(){
 void process_scheduler_init() {
     //initialize registers to idle program state
     registers = REGS();
-    registers.Base = 0;
     registers.AC = 1; // needs to be greater than zero.
 
     // load idle program
@@ -153,8 +150,8 @@ void process_context_switch(PCB &currentPCB, PCB &newPCB){
     }
 }
 
-void process_submit(std::string fname, int base, MemoryMetadata metadata){
-    PCB p = process_init_PCB(fname,base, metadata);
+void process_submit(std::string& fname, MemoryMetadata& metadata){
+    PCB p = process_init_PCB(fname, metadata);
     print_init_spool(p.PID);
     process_insert_readyQ(p);
 }
@@ -182,7 +179,7 @@ void process_execute(){
                     process_context_switch(running_pcb, ready_pcb);
                 }
                 else if(running_pcb != idle_prog){ // Continue executing the user's program since the RQ is empty.
-                    display_process_continuation_msg(running_pcb.PID, running_pcb.cpuRegisters.Base);
+                    display_process_continuation_msg(running_pcb.PID, running_pcb.file_name);
                     running_pcb.priority = std::min((rq_levels - 1), (running_pcb.priority + 1));
                 }
                 break;
@@ -194,7 +191,7 @@ void process_execute(){
                     process_context_switch(running_pcb, ready_pcb);
                 }
                 else if(running_pcb != idle_prog){
-                    display_process_continuation_msg(running_pcb.PID, running_pcb.cpuRegisters.Base);
+                    display_process_continuation_msg(running_pcb.PID, running_pcb.file_name);
                 }
                 break;
             }
@@ -216,6 +213,7 @@ void process_execute(){
 }
 
 void process_exit(int pid){
+    reclaim_memory(running_pcb.metadata.page_table);
     process_dispose_PCB(pid);
     print_end_spool(pid);
 }

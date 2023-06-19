@@ -26,15 +26,17 @@ Page resident_set_check(int page_no){
     }
     else{
         int physical_address = get_physical_address(page_no, 0);
-        p.data = std::vector<int>();
-        int page_book_end = physical_address + pageSize - 1;
+        p.page_no = page_no;
+        p.data = std::vector<int>(pageSize);
+        int page_book_end = physical_address + pageSize;
 
         for(int i = physical_address; i < page_book_end; ++i)
             p.data.at(i - physical_address) = Mem.at(i);
-    }
 
-    if(pages.size() == WS){
-        pages.pop_back();
+        if(pages.size() == WS){
+            references.erase(pages.back().page_no);
+            pages.pop_back();
+        }
     }
 
     pages.push_front(p);

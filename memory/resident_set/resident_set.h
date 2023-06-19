@@ -10,6 +10,7 @@
 
 extern int WS;
 struct Page{
+    int page_no;
     std::vector<int> data;
 };
 
