@@ -68,9 +68,6 @@ void shell_command(int cmd){
         case 5:
             process_dump_PCB();
             break;
-        /*case 6:
-            print_act({DUMP_SPOOL, CID}, "dump_spool");
-            break;*/
         default:
             break;
     }

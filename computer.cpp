@@ -54,7 +54,7 @@ void read_system_parameters(){
 
 void boot_system(char* arg){
     terminateFlag = false;
-    CID = strtol(arg, nullptr, 10);
+    CID = int(strtol(arg, nullptr, 10));
     read_system_parameters();
 }
 

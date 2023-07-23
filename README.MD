@@ -1,10 +1,10 @@
 # MonoOS
-A monolithic OS with MLFQ scheduling, on-demand paging, inter-process synchronization and communication and 
+A monolithic OS with MLFQ process scheduling, on-demand paging, inter-process synchronization and communication and 
 a device manager supporting network devices. 
 
 On device management, MonoOS currently supports connections to a simulated printer. 
 
-MonoOS also features a simulated CPU which executes user programs written as specified in [User Programs](#user-programs).
+MonoOS also features a simulated CPU which executes user programs written as specified in [User Programs](#assembly).
 
 ## Assembly
 Below is the assembly datasheet.
@@ -14,7 +14,7 @@ Below is the assembly datasheet.
 |    1    |    load     |  word   | load integer word to AC register                     |
 |    2    |    load     | address | load contents at address to AC                       |
 |    3    |     add     | address | load contents to MBR and add MBR to AC               |
-|    4    |  multiply   | address | Similar to add instruction but for multiplication    |
+|    4    |     mul     | address | Similar to add instruction but for multiplication    |
 |    5    |    store    | address | Store AC to address                                  |
 |    6    |    ifgo     | address | If AC > 0, branch to address; else, next instruction |
 |    7    |    print    |    0    | Print AC, operand is unused                          |
@@ -22,13 +22,40 @@ Below is the assembly datasheet.
 |    9    |    shell    |  code   | Execute the shell command for given code             |
 |    0    |    exit     |    0    | End of current user program                          |
 
-See this example [program](prog_factorial.txt) which computes ``
 ### Shell
+MonoOS provides an interactive shell that allows users to submit programs, terminate the OS, 
+and view internal system state, such as register and memory contents, ready queue processes, etc.
+
+| Code | Operation                                                                                  |
+|:----:|--------------------------------------------------------------------------------------------|
+|  0   | Terminate the OS                                                                           |
+|  1   | Submit a new program. File name must be specified when prompted with "Input Program File>" |
+|  2   | Dump state of registers                                                                    |
+|  3   | Dump contents of memory pages for running process                                          |
+|  4   | Dump PIDs of processes in the MLFQ                                                         |
+|  5   | Dump all PCBs                                                                              |
+
+Below are shell commands accessible as instructions by the simulated CPU.
+
+| Code | Operation                                                       |
+|:----:|-----------------------------------------------------------------|
+|  2   | Dump state of registers                                         |
+|  3   | Dump contents of memory pages for running process               |
+|  4   | Dump PIDs of processes in the Multi-Level Feedback Queue (MLFQ) |
+|  5   | Dump all PCBs                                                   |
+|  6   | Dump PIDs of processes with open spool files.                   |
+
+## Example Program
+For an example, see this [program](factorial_program.txt) which computes `b = a! % |d|`
+For more details on the program, see its [assembly](factorial_program.asm).
+
 
 ## Run
 The computer expects to connect to the printer server, so ensure to run it as shown below.
 
 ### Run printer
+This process will generate an output file named `printer.out` containing the results of all executed programs.
+Note that each program's output is spooled.
   ````
   ./exec_printer.sh
   ````
@@ -58,7 +85,7 @@ Ensure to have already completed [Run Printer](#run-printer).
         ├── printer.cpp
         ├── scheduler.cpp
         ├── shell.cpp
-        ├── config.sys
+        ├── config.txt
         ├── computer/
         │   ├── computer.h
         │   └── print.h

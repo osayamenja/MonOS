@@ -110,7 +110,7 @@ void process_scheduler_init() {
     registers.AC = 1; // needs to be greater than zero.
 
     // load idle program
-    std::string idle_fname = "prog-idle.txt";
+    std::string idle_fname = "prog_idle.txt";
     MemoryMetadata m = load_prog(const_cast<char*>(idle_fname.c_str()));
 
     idle_prog = PCB();
