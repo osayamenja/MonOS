@@ -47,7 +47,7 @@ Below are shell commands accessible as instructions by the simulated CPU.
 
 ## Example Program
 For an example, see this [program](factorial_program.txt) which computes `b = a! % |d|`
-For more details on the program, see its [assembly](factorial_program.asm).
+For more details on the program, see its [assembly](factorial_program.MD).
 
 
 ## Run

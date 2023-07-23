@@ -1,6 +1,10 @@
-/*
-compute b = a! % |d|
-*/
+# Assembly for Sample Program
+Below is a more familiar depiction in assembly of the provided sample program.
+Also included are comments explaining each operation.
+
+```
+/*compute b = a! % |d|*/
+
 load a, 5
 load b, 1
 load c, -1
@@ -39,3 +43,4 @@ main:
       print  // print final result
       sleep 20000
       exit // 0 0
+```
