@@ -19,12 +19,12 @@
 std::string paper_name = "printer.out";
 std::unordered_map<int, std::unordered_set<int>> spool_files; // CID -> set of its processes.
 std::string spool_f_name = "spool_";
-std::deque<PrinterOpDetails> printer_ops;
+std::deque<std::vector<int>> printer_ops;
 
 int NC;
 int MQS;
-/*std::string ip_addr;*/
-/*int port;*/
+std::string ip_addr;
+int port;
 int CQS;
 int PT;
 bool printer_terminate_flag;
@@ -32,14 +32,14 @@ bool printer_terminate_flag;
 void printer_init(){
     atomically_print_to_stdout("Printer Process starting...");
     spool_files = std::unordered_map<int, std::unordered_set<int>>();
-    printer_ops = std::deque<PrinterOpDetails>();
+    printer_ops = std::deque<std::vector<int>>();
 
     if(exists(paper_name) && remove(paper_name.c_str())){
         perror("Error initializing the printer");
         exit(0);
     }
 
-    std::FILE* paper = fopen (paper_name.c_str(),"a+");
+    std::FILE* paper = fopen (paper_name.c_str(),"a");
     if(paper != nullptr){
         fclose(paper);
     }
@@ -70,30 +70,9 @@ std::string get_process_name(int comp_id, int pid){
     return std::to_string(comp_id).append("_").append(std::to_string(pid));
 }
 
-void printer_end_spool(int comp_id, int pid){
-    std::FILE* spool_file = fopen(get_spool_fname(comp_id, pid).c_str(), "a+");
-    std::FILE* paper = fopen(paper_name.c_str(), "a+");
-    std::string title = get_indented_str("Process " + get_process_name(comp_id, pid), 19);
-
-    fputs(generate_header().c_str(), paper);
-    fputs(title.c_str(), paper);
-    fputs(generate_header().c_str(), paper);
-
-    append_file(spool_file, paper);
-
-    fclose(spool_file);
-    fclose(paper);
-
-    if(remove(get_spool_fname(comp_id, pid).c_str())){
-        perror(get_spool_fname(comp_id, pid).append(" failed to delete").c_str());
-    }
-    spool_files.at(comp_id).erase(pid);
-    atomically_print_to_stdout("Completed printing for finished Process " + get_process_name(comp_id, pid));
-}
-
-void printer_end_spool(int comp_id, int pid, const std::string& addendum){ //switch to closing here
-    std::FILE* spool_file = fopen(get_spool_fname(comp_id, pid).c_str(), "a+");
-    std::FILE* paper = fopen(paper_name.c_str(), "a+");
+void printer_end_spool(int comp_id, int pid, const std::string& addendum = ""){
+    std::FILE* spool_file = fopen(get_spool_fname(comp_id, pid).c_str(), "r");
+    std::FILE* paper = fopen(paper_name.c_str(), "a");
     std::string title = get_indented_str("Process " + get_process_name(comp_id, pid), 19);
 
     fputs(generate_header().c_str(), paper);
@@ -101,6 +80,7 @@ void printer_end_spool(int comp_id, int pid, const std::string& addendum){ //swi
     fputs(generate_header().c_str(), paper);
 
     append_file(spool_file, paper, addendum);
+    fflush(paper);
 
     fclose(spool_file);
     fclose(paper);
@@ -108,13 +88,20 @@ void printer_end_spool(int comp_id, int pid, const std::string& addendum){ //swi
     if(remove(get_spool_fname(comp_id, pid).c_str())){
         perror(get_spool_fname(comp_id, pid).append(" failed to delete").c_str());
     }
-    atomically_print_to_stdout("Completed printing for unfinished Process " + get_process_name(comp_id, pid));
+    if(addendum.empty()){
+        spool_files.at(comp_id).erase(pid);
+        atomically_print_to_stdout("Completed printing for finished Process " + get_process_name(comp_id, pid));
+    }
+    else{
+        atomically_print_to_stdout("Completed printing for unfinished Process " + get_process_name(comp_id, pid));
+    }
 }
 
 void printer_print(int comp_id, int pid, const std::string& buf){// assume buf has a newline at the end.
-    std::FILE* spool_file = fopen(get_spool_fname(comp_id, pid).c_str(), "a+");
+    std::FILE* spool_file = fopen(get_spool_fname(comp_id, pid).c_str(), "a");
     fputs(buf.c_str(), spool_file);
-    fclose(spool_file); // needed to persist the data to the file.
+    fflush(spool_file);
+    fclose(spool_file);
 }
 
 void printer_dump_spool(int comp_id){
@@ -154,11 +141,7 @@ void printer_main(){
 
         while(!printer_ops.empty()){
             execute_printer_op(printer_ops.front());
-            PrinterOpDetails d = printer_ops.front();
             printer_ops.pop_front();
-            if(d.op == TERMINATE){
-                signal_termination(d.c_id);
-            }
         }
 
         while(num_waits > 0){
@@ -168,35 +151,26 @@ void printer_main(){
     }
 }
 
-void printerOps_queue_insert(const std::vector<int>& ops, int communicator_id){
-    PrinterOpDetails p = {
-            getPrinterOp(ops.at(0)),
-            ops.at(1),
-            ops.at(2),
-            ops.at(3),
-            communicator_id
-    };
-    printer_ops.push_back(p);
+void printerOps_queue_insert(std::string& message){
+    auto ops = separate_str(message.data(), ", ");
+    printer_ops.push_back(ops);
 }
 
-void execute_printer_op(PrinterOpDetails op_details){
-    int printer_op = op_details.op;
-    int comp_id = op_details.computer_id;
-    int pid = op_details.pid;
-    int buf = op_details.buf;
+void execute_printer_op(const std::vector<int>& op_details){
+    PrinterOp printer_op = getPrinterOp(op_details.at(0));
+    int comp_id = op_details.at(1);
 
-    auto operation = getPrinterOp(printer_op);
-    switch(operation){
+    switch(printer_op){
         case INIT_SPOOL:{
-            printer_init_spool(comp_id, pid);
+            printer_init_spool(comp_id, op_details.at(2));
             break;
         }
         case END_SPOOL:{
-            printer_end_spool(comp_id, pid);
+            printer_end_spool(comp_id, op_details.at(2));
             break;
         }
         case PRINT:{
-            printer_print(comp_id, pid, std::to_string(buf).append("\n"));
+            printer_print(comp_id, op_details.at(2), std::to_string(op_details.at(3)).append("\n"));
             break;
         }
         case TERMINATE:
@@ -206,8 +180,8 @@ void execute_printer_op(PrinterOpDetails op_details){
             printer_dump_spool(comp_id);
             break;
         default:{
-            std::string err = "Wrong PrinterOp received";
-            err.append(std::to_string(operation));
+            std::string err = "Wrong PrinterOp received: ";
+            err.append(std::to_string(printer_op));
             perror(err.c_str());
             exit(NOOP);
         }
@@ -248,27 +222,29 @@ void load_printer_parameters(int skip){
         port = std::stoi(line); // obtains printer's port from config.sys file.
 
         for(int i = 0; i < skip; ++i){
-            get_line(config_file); // skip M, TQ
+            get_line(config_file); // skip M, TQ, WS
         }
 
         std::tie(std::ignore, line) = get_line(config_file);
-        PT = std::stoi(line); // obtains NC from config.sys file.
+        PT = std::stoi(line); // obtains printer delay time from config.sys file.
 
         std::tie(std::ignore, line) = get_line(config_file);
-        NC = std::stoi(line); // obtains NC from config.sys file.
+        NC = std::stoi(line); // obtains number of communicator threads from config.sys file.
 
         std::tie(std::ignore, line) = get_line(config_file);
-        CQS = std::stoi(line); // obtains CQS from config.sys file.
+        // obtains size of backlog device connections from config.sys file.
+        CQS = std::stoi(line);
 
         std::tie(std::ignore, line) = get_line(config_file);
-        MQS = std::stoi(line); // obtains MQS from config.sys file.
+        // obtains size of message queue shared between communicator and printer thread from config.sys file.
+        MQS = std::stoi(line);
     }
 }
 
 
-/*int main(){
-    load_printer_parameters(2);
+int main(){
+    load_printer_parameters(3);
     printer_manager(NC, CQS, MQS);
     return 0;
-}*/
+}
 

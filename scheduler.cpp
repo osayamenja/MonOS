@@ -13,12 +13,11 @@
 #include "utility/utility.h"
 #include "scheduler/queue.h"
 #include "scheduler/scheduler.h"
-#include "utility/computer_utility/computer_utility.h"
 
 std::unordered_map<int, PCB> PCBs;
 int initial_PID;
 PCB idle_prog;
-int idle_prog_PID = 1;
+int idle_prog_PID = 0;
 PCB running_pcb;
 int current_mem_instr_time;
 MemoryMetadata current_process_metadata;
@@ -37,9 +36,8 @@ void process_init_PCBs(){
     PCBs = std::unordered_map<int, PCB>();
 }
 
-PCB process_init_PCB(std::string &fname, int Base, MemoryMetadata &metadata){
+PCB process_init_PCB(std::string &fname, MemoryMetadata &metadata){
     REGS regs = REGS();
-    regs.Base = Base;
     PCB p = {
         get_and_update_PID(),
         regs,
@@ -63,14 +61,13 @@ void process_dump_PCB(){
     dump_stream << std::setw(17) <<"PCB Dump" << std::endl;
     dump_stream << generate_header();
 
-    dump_stream << "Index: [ Filename:XXXXX, PID:#, BASE:#, PC:#, IR0:#, IR1:#, AC:#, MAR:#, MBR:# ]" << std::endl;
+    dump_stream << "Index: [ Filename:XXXXX, PID:#, PC:#, IR0:#, IR1:#, AC:#, MAR:#, MBR:# ]" << std::endl;
     int i  = 0;
     for(const auto& pcb : PCBs){
         PCB p = pcb.second;
         dump_stream << i << ": [";
         dump_stream << "Filename:" << p.file_name << ", ";
         dump_stream << "PID:" << p.PID << ", ";
-        dump_stream << "BASE:" << p.cpuRegisters.Base << ", ";
         dump_stream << "PC:" << p.cpuRegisters.PC << ", ";
         dump_stream << "IR0:" << p.cpuRegisters.IR0 << ", ";
         dump_stream << "IR1:" << p.cpuRegisters.IR1 << ", ";
@@ -110,12 +107,11 @@ void process_dump_readyQ(){
 void process_scheduler_init() {
     //initialize registers to idle program state
     registers = REGS();
-    registers.Base = 0;
     registers.AC = 1; // needs to be greater than zero.
 
     // load idle program
-    std::string idle_fname = "prog-idle.txt";
-    MemoryMetadata m = load_prog(const_cast<char*>(idle_fname.c_str()), 0);
+    std::string idle_fname = "prog_idle.txt";
+    MemoryMetadata m = load_prog(const_cast<char*>(idle_fname.c_str()));
 
     idle_prog = PCB();
     idle_prog.PID = idle_prog_PID;
@@ -125,7 +121,7 @@ void process_scheduler_init() {
 
     current_mem_instr_time = 0;
     process_init_PCBs();
-    initial_PID = 2;
+    initial_PID = 1;
 
     current_process_metadata = idle_prog.metadata;
     running_pcb = PCB();
@@ -153,9 +149,11 @@ void process_context_switch(PCB &currentPCB, PCB &newPCB){
     }
 }
 
-void process_submit(std::string fname, int base, MemoryMetadata metadata){
-    PCB p = process_init_PCB(fname,base, metadata);
-    print_init_spool(p.PID);
+void process_submit(std::string& fname, MemoryMetadata& metadata){
+    PCB p = process_init_PCB(fname, metadata);
+    print_act({INIT_SPOOL, CID, p.PID},
+              "print::init_spool",
+              "Started spool for process " + std::to_string(p.PID));
     process_insert_readyQ(p);
 }
 
@@ -182,7 +180,6 @@ void process_execute(){
                     process_context_switch(running_pcb, ready_pcb);
                 }
                 else if(running_pcb != idle_prog){ // Continue executing the user's program since the RQ is empty.
-                    display_process_continuation_msg(running_pcb.PID, running_pcb.cpuRegisters.Base);
                     running_pcb.priority = std::min((rq_levels - 1), (running_pcb.priority + 1));
                 }
                 break;
@@ -192,9 +189,6 @@ void process_execute(){
                 PCB ready_pcb = process_fetch_readyQ();
                 if(ready_pcb != idle_prog){
                     process_context_switch(running_pcb, ready_pcb);
-                }
-                else if(running_pcb != idle_prog){
-                    display_process_continuation_msg(running_pcb.PID, running_pcb.cpuRegisters.Base);
                 }
                 break;
             }
@@ -216,12 +210,22 @@ void process_execute(){
 }
 
 void process_exit(int pid){
+    reclaim_memory(running_pcb.metadata.page_table);
     process_dispose_PCB(pid);
-    print_end_spool(pid);
+    print_act({END_SPOOL, CID, pid},
+              "print::end_spool",
+              "Ended spooling for process " + std::to_string(pid));
 }
 
 void scheduler_terminate(){
     atomically_print_to_stdout("Terminating scheduler...");
     PCBs.clear();
-    print_terminate();
+    print_act({TERMINATE, CID},
+              "print::terminate",
+              "Print & Printer Termination complete!");
+    stop_print();
+}
+
+PCB get_running_PCB(){
+    return running_pcb;
 }

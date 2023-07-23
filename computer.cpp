@@ -45,13 +45,16 @@ void read_system_parameters(){
 
         std::tie(std::ignore, line) = get_line(config_file);
         TQ = std::stoi(line); // obtains time quantum from config.sys file.
-        mem_delay = TQ;
+        mem_delay = TQ; // simulated memory delay for MLFQ scheduling
+
+        std::tie(std::ignore, line) = get_line(config_file);
+        WS = std::stoi(line); // obtains working set size from config.sys file.
     }
 }
 
 void boot_system(char* arg){
     terminateFlag = false;
-    CID = strtol(arg, nullptr, 10);
+    CID = int(strtol(arg, nullptr, 10));
     read_system_parameters();
 }
 
@@ -59,6 +62,7 @@ int main(int argc, char* argv[]) {
     std::thread::id main_id = std::this_thread::get_id();
     boot_system(argv[1]);
 
+    load_init();
     mem_init(memorySize);
     process_scheduler_init();
 

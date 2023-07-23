@@ -15,7 +15,6 @@
 #include "shell/shell.h"
 
 bool shouldTerminate;
-
 void shell_main(){
     int command;
     int sleep_time = 10000;
@@ -39,20 +38,23 @@ void shell_init(){
 void shell_command(int cmd){
     std::string prog_file_name;
     MemoryMetadata m{};
-    int base;
     switch (cmd) {
         case 0:
             shouldTerminate = true;
             terminateFlag = true;
             break;
         case 1:
-            atomically_print_to_stdout("Input Program File and Base>");
+            atomically_print_to_stdout("Input Program File>");
             std::cin >> prog_file_name;
-            std::cin >> base;
-            m = load_prog(const_cast<char*>(prog_file_name.c_str()), base);
-            process_submit(prog_file_name, base, m);
-            atomically_print_to_stdout("Submitted {fname->"
-                                    + prog_file_name + ", " + std::to_string(base) + "}");
+            m = load_prog(const_cast<char*>(prog_file_name.c_str()));
+            if(!m.isOutOfMemory){
+                process_submit(prog_file_name, m);
+                atomically_print_to_stdout("Submitted fname->"
+                                           + prog_file_name + "}");
+            }
+            else{
+                atomically_print_to_stdout("OutOfMemory: Release memory and retry");
+            }
             break;
         case 2:
             shell_print_registers();
@@ -66,9 +68,6 @@ void shell_command(int cmd){
         case 5:
             process_dump_PCB();
             break;
-        case 6:
-            print_dump_spool();
-            break;
         default:
             break;
     }
@@ -80,5 +79,5 @@ void shell_print_registers(){
 }
 
 void shell_print_memory(){
-    mem_dump_memory();
+    mem_dump_secondary_memory();
 }

@@ -4,10 +4,9 @@
 
 #include <arpa/inet.h>
 #include <string>
-#include <tuple>
 #include "client_connector.h"
 
-std::tuple<int, int> client_connect(int port, const std::string& ip_address){
+int client_connect(int port, const std::string& ip_address){
     int client_socket;
     int client;
     struct sockaddr_in serv_addr{};
@@ -28,7 +27,7 @@ std::tuple<int, int> client_connect(int port, const std::string& ip_address){
         perror("Client connection failed");
         exit(-1);
     }
-    return std::make_tuple(client_socket, client);
+    return client_socket;
 }
 
 

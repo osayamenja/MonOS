@@ -25,7 +25,7 @@ enum PrinterOp{
 };
 
 enum ACK{
-    PRINTER_ACK
+    COMMUNICATOR_ACK = 1
 };
 
 //String utility functions
@@ -33,17 +33,20 @@ std::string generate_header();
 std::tuple<bool, std::string> get_line(std::FILE* f);
 std::string get_indented_str(const std::string& str, int indent);
 std::vector<int> separate_spaced_str(char str[]);
-
-// Printer utility
-PrinterOp getPrinterOp(int i);
+std::vector<int> separate_str(char str[], const std::string& delim);
+int conv_to_int(char* buffer);
+size_t get_size(int i);
 
 // std utility function
 void atomically_print_to_stdout(const std::string &s);
 
 // file descriptor I/O utility functions
-/*size_t sendAll(int fd, int buf, size_t n, int f);
-size_t readAll(int fd, char *buffer, size_t n);*/
-size_t sendAll(int fd, int buf, int f);
-size_t readAll(int fd, int *output_buf);
+int sendAny(int fd, char* data, ulong len, int f);
+size_t readAny(int fd, char *data, ulong len, int f);
+size_t sendInt(int fd, int buf, int f);
+size_t readAndVerifyInt(int fd, char *data, ulong len, int f, int expected, const std::string& expectedName);
+
+// socket utility
+std::string build_msg(std::vector<int> args);
 
 #endif //AIMUYO_OS_PROJECT_UTILITY_H

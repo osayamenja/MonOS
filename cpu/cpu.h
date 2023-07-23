@@ -8,7 +8,6 @@
 
 struct REGS {
     int AC;
-    int Base;
     int IR0;
     int IR1;
     int MAR;
