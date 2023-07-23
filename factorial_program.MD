@@ -1,4 +1,8 @@
-```asm
+# Assembly for Sample Program
+Below is a more familiar depiction in assembly of the provided sample program.
+Also included are comments explaining each operation.
+
+```
 /*compute b = a! % |d|*/
 
 load a, 5
