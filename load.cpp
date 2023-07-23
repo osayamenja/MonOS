@@ -29,8 +29,6 @@ int pages_needed(int instructions, int data){
 void load_init(){
     for(int i = 0; i < memorySize; ++i)
         free_pages.push_back(i);
-
-    disk_index = get_physical_address(free_pages.front(), 0);
 }
 
 MemoryMetadata load_prog(char *fname){
@@ -56,6 +54,8 @@ MemoryMetadata load_prog(char *fname){
         }
 
         std::tie(isEOF, line) = get_line(programFile);
+        disk_index = get_physical_address(free_pages.front(), 0);
+
         while(!isEOF){
             char *word = strtok(const_cast<char*>(line.c_str()), " ");
             while(word != nullptr && strcmp(word, "\n") != 0){

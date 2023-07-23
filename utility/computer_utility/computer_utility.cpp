@@ -2,9 +2,7 @@
 // Created by Osayamen on 4/2/2023.
 //
 
-#include <vector>
 #include <string>
-#include <cstring>
 #include "computer_utility.h"
 #include "../utility.h"
 

@@ -15,7 +15,6 @@
 #include "shell/shell.h"
 
 bool shouldTerminate;
-std::mutex shell_mtx;
 void shell_main(){
     int command;
     int sleep_time = 10000;
@@ -37,7 +36,6 @@ void shell_init(){
 }
 
 void shell_command(int cmd){
-    shell_mtx.lock();
     std::string prog_file_name;
     MemoryMetadata m{};
     switch (cmd) {
@@ -70,13 +68,12 @@ void shell_command(int cmd){
         case 5:
             process_dump_PCB();
             break;
-        case 6:
-            print_dump_spool();
-            break;
+        /*case 6:
+            print_act({DUMP_SPOOL, CID}, "dump_spool");
+            break;*/
         default:
             break;
     }
-    shell_mtx.unlock();
 }
 
 

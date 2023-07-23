@@ -4,6 +4,7 @@
 
 #include <unordered_map>
 #include <list>
+
 #include "resident_set.h"
 #include "../memory.h"
 #include "../loader/load.h"
@@ -11,6 +12,7 @@
 std::list<Page> pages;
 std::unordered_map<int, std::list<Page>::iterator> references;
 
+// LRU Cache
 void resident_set_init(int ws){
     WS = ws;
     pages = std::list<Page>();

@@ -1,34 +1,32 @@
 # MonoOS
-A monolithic OS with MLFQ scheduling, memory manager supporting on-demand paging and 
+A monolithic OS with MLFQ scheduling, on-demand paging, inter-process synchronization and communication and 
 a device manager supporting network devices. 
 
-MonoOS also features a simulated CPU which executes user programs written as specified in  
+On device management, MonoOS currently supports connections to a simulated printer. 
 
-### Note
-Given that this is still an in-progress project, documentation will be slightly less than exhaustive.
-
-However, we aim to complete this README as soon as changes are complete for the OS.
-
+MonoOS also features a simulated CPU which executes user programs written as specified in x.
 
 ## Run
 You have to execute the printer device first since the computer expects to connect to it.
 
 ### Run printer
+**You must run this command, if you want to use the simulated printer.**
   ````
   ./exec_printer.sh
   ````
 
 
 ### Run Computer
-You can run the computer next
-  ````
-  ./exec_computer.sh
-  ````
+Below will execute a simulated computer that runs on MonoOS.
+Including `true` as an argument, means you have already completed [Run Printer](#run-printer).
+If not, expect an error.
 
+  ````
+  ./exec_computer.sh <insert computerID> <insert 'true' to use simulated printer>
+  ````
 
 ## File Structure
-- See the below diagram to navigate the directory.
-- The root directory is `MonoOS`.
+- 
 - The idle program should be in `prog-idle.txt`.
   This is needed to ensure the CPU maintains operation even when no user processes are available. 
 
@@ -42,13 +40,10 @@ You can run the computer next
         ├── printer.cpp
         ├── scheduler.cpp
         ├── shell.cpp
-        ├── makefile
+        ├── config.txt
         ├── computer/
         │   ├── computer.h
         │   └── print.h
-        ├── computer_utility/
-        │   ├── computer_utility.cpp
-        │   └── computer_utility.h
         ├── connector/
         │   ├── client_connector.cpp
         │   ├── client_connector.h
@@ -63,15 +58,15 @@ You can run the computer next
         │       ├── communicator/
         │       │   ├── communicator.cpp
         │       │   └── communicator.h
-        │       ├── printer_manager/
-        │       │   ├── printer_manager.cpp
-        │       │   └── printer_manager.h
-        │       └── printer_utility/
-        │           ├── printer_utility.cpp
-        │           └── printer_utility.h
-        │   
+        │       └── printer_manager/
+        │           ├── printer_manager.cpp
+        │           └── printer_manager.h
         ├── memory/
-        │   ├── load.h
+        │   ├── loader/
+        │   │   └── load.h
+        │   ├── resident_set/
+        │   │   ├── resident_set.cpp
+        │   │   └── resident_set.h
         │   ├── memory.cpp
         │   └── memory.h
         ├── printer_utility/
@@ -84,6 +79,12 @@ You can run the computer next
         ├── shell/
         │   └── shell.h
         └── utility/
+            ├── computer_utility/
+            │   ├── computer_utility.cpp
+            │   └── computer_utility.h
+            ├── file_utility/
+            │   ├── file_utility.cpp
+            │   └── file_utility.h
             ├── utility.cpp
             └── utility.h
     
@@ -91,7 +92,7 @@ You can run the computer next
 
 ## Architecture
 
-### COMING SOON...
+### TODO
 
 
 ## MLFQ Scheduling

@@ -11,7 +11,6 @@
 #include "../computer/print.h"
 #include "../memory/memory.h"
 #include "../scheduler/scheduler.h"
-#include "../shell/shell.h"
 #include "../utility/utility.h"
 #include "cpu.h"
 
@@ -124,7 +123,7 @@ void cpu_execute_instruction(int pid){
             break;
 
         case 7:{
-            print_print(pid, registers.AC);
+            print_act({PRINT, CID, pid, registers.AC}, "print::print");
             break;
         }
 
@@ -133,7 +132,25 @@ void cpu_execute_instruction(int pid){
             break;
 
         case 9:
-            shell_command(registers.IR1);
+            switch (registers.IR1) {
+                case 2:
+                    cpu_dump_registers();
+                    break;
+                case 3:
+                    mem_dump_secondary_memory();
+                    break;
+                case 4:
+                    process_dump_readyQ();
+                    break;
+                case 5:
+                    process_dump_PCB();
+                    break;
+                case 6:
+                    print_act({DUMP_SPOOL, CID}, "dump_spool");
+                    break;
+                default:
+                    break;
+            }
             break;
 
         case 0:

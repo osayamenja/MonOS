@@ -41,7 +41,9 @@ void mem_read(){
 }
 
 void mem_write(){
-    resident_set_write(get_page_number(registers.MAR), registers.MAR, registers.MBR);
+    resident_set_write(get_page_number(registers.MAR),
+                       get_page_offset(registers.MAR),
+                       registers.MBR);
 }
 
 void mem_dump_secondary_memory(){
@@ -54,10 +56,12 @@ void mem_dump_secondary_memory(){
     dump_stream << "Page Number-> {Physical Address: Content}" << std::endl;
 
     for(int i : current_process_metadata.page_table){
-        Page p = resident_set_check(i);
-        dump_stream << "P" << i << "-> {" << get_physical_address(i, 0) << ": " << p.data.at(0);
-        for(int j = 1; j < p.data.size(); ++j){
-            dump_stream << ", " << get_physical_address(i, j) << ": " << p.data.at(j);
+        int j = get_physical_address(i, 0);
+        int page_end = j + pageSize;
+
+        dump_stream << "P" << i << "-> {" << get_physical_address(i, 0) << ": " << Mem.at(j++);
+        for(int k = j; k < page_end; ++k){
+            dump_stream << ", " << k << ": " << Mem.at(k);
         }
         dump_stream << "}" << std::endl;
     }

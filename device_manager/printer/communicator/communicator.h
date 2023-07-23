@@ -16,7 +16,7 @@ void communicators_init(int nc, int mqs);
 void communicator(int id);
 
 void message_queues_consume();
-void message_queues_insert(const std::vector<int>& m, int id);
+void message_queues_insert(const std::string& m, int id);
 void signal_termination(int id);
 
 

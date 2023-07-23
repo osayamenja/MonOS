@@ -13,7 +13,6 @@
 #include "utility/utility.h"
 #include "scheduler/queue.h"
 #include "scheduler/scheduler.h"
-#include "utility/computer_utility/computer_utility.h"
 
 std::unordered_map<int, PCB> PCBs;
 int initial_PID;
@@ -152,7 +151,9 @@ void process_context_switch(PCB &currentPCB, PCB &newPCB){
 
 void process_submit(std::string& fname, MemoryMetadata& metadata){
     PCB p = process_init_PCB(fname, metadata);
-    print_init_spool(p.PID);
+    print_act({INIT_SPOOL, CID, p.PID},
+              "print::init_spool",
+              "Started spool for process " + std::to_string(p.PID));
     process_insert_readyQ(p);
 }
 
@@ -179,7 +180,7 @@ void process_execute(){
                     process_context_switch(running_pcb, ready_pcb);
                 }
                 else if(running_pcb != idle_prog){ // Continue executing the user's program since the RQ is empty.
-                    display_process_continuation_msg(running_pcb.PID, running_pcb.file_name);
+                    //display_process_continuation_msg(running_pcb.PID, running_pcb.file_name);
                     running_pcb.priority = std::min((rq_levels - 1), (running_pcb.priority + 1));
                 }
                 break;
@@ -191,7 +192,7 @@ void process_execute(){
                     process_context_switch(running_pcb, ready_pcb);
                 }
                 else if(running_pcb != idle_prog){
-                    display_process_continuation_msg(running_pcb.PID, running_pcb.file_name);
+                    //display_process_continuation_msg(running_pcb.PID, running_pcb.file_name);
                 }
                 break;
             }
@@ -215,13 +216,18 @@ void process_execute(){
 void process_exit(int pid){
     reclaim_memory(running_pcb.metadata.page_table);
     process_dispose_PCB(pid);
-    print_end_spool(pid);
+    print_act({END_SPOOL, CID, pid},
+              "print::end_spool",
+              "Ended spooling for process " + std::to_string(pid));
 }
 
 void scheduler_terminate(){
     atomically_print_to_stdout("Terminating scheduler...");
     PCBs.clear();
-    print_terminate();
+    print_act({TERMINATE, CID},
+              "print::terminate",
+              "Print & Printer Termination complete!");
+    stop_print();
 }
 
 PCB get_running_PCB(){
