@@ -1,3 +1,4 @@
 cmake-build-debug
 .idea
 prog[0-9].txt
+printer.out

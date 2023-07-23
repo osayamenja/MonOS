@@ -226,16 +226,18 @@ void load_printer_parameters(int skip){
         }
 
         std::tie(std::ignore, line) = get_line(config_file);
-        PT = std::stoi(line); // obtains NC from config.sys file.
+        PT = std::stoi(line); // obtains printer delay time from config.sys file.
 
         std::tie(std::ignore, line) = get_line(config_file);
-        NC = std::stoi(line); // obtains NC from config.sys file.
+        NC = std::stoi(line); // obtains number of communicator threads from config.sys file.
 
         std::tie(std::ignore, line) = get_line(config_file);
-        CQS = std::stoi(line); // obtains CQS from config.sys file.
+        // obtains size of backlog device connections from config.sys file.
+        CQS = std::stoi(line);
 
         std::tie(std::ignore, line) = get_line(config_file);
-        MQS = std::stoi(line); // obtains MQS from config.sys file.
+        // obtains size of message queue shared between communicator and printer thread from config.sys file.
+        MQS = std::stoi(line);
     }
 }
 

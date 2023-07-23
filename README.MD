@@ -4,31 +4,49 @@ a device manager supporting network devices.
 
 On device management, MonoOS currently supports connections to a simulated printer. 
 
-MonoOS also features a simulated CPU which executes user programs written as specified in x.
+MonoOS also features a simulated CPU which executes user programs written as specified in [User Programs](#user-programs).
+
+## Assembly
+Below is the assembly datasheet.
+
+| OP Code | Instruction | Operand | Operation                                            |
+|:-------:|:-----------:|:-------:|------------------------------------------------------|
+|    1    |    load     |  word   | load integer word to AC register                     |
+|    2    |    load     | address | load contents at address to AC                       |
+|    3    |     add     | address | load contents to MBR and add MBR to AC               |
+|    4    |  multiply   | address | Similar to add instruction but for multiplication    |
+|    5    |    store    | address | Store AC to address                                  |
+|    6    |    ifgo     | address | If AC > 0, branch to address; else, next instruction |
+|    7    |    print    |    0    | Print AC, operand is unused                          |
+|    8    |    sleep    |    t    | Sleep for t microseconds                             |
+|    9    |    shell    |  code   | Execute the shell command for given code             |
+|    0    |    exit     |    0    | End of current user program                          |
+
+See this example [program](prog_factorial.txt) which computes ``
+### Shell
 
 ## Run
-You have to execute the printer device first since the computer expects to connect to it.
+The computer expects to connect to the printer server, so ensure to run it as shown below.
 
 ### Run printer
-**You must run this command, if you want to use the simulated printer.**
   ````
   ./exec_printer.sh
   ````
 
-
 ### Run Computer
 Below will execute a simulated computer that runs on MonoOS.
-Including `true` as an argument, means you have already completed [Run Printer](#run-printer).
-If not, expect an error.
+Ensure to have already completed [Run Printer](#run-printer).
 
   ````
-  ./exec_computer.sh <insert computerID> <insert 'true' to use simulated printer>
+  ./exec_computer.sh <insert computerID>
   ````
 
 ## File Structure
-- 
-- The idle program should be in `prog-idle.txt`.
-  This is needed to ensure the CPU maintains operation even when no user processes are available. 
+- `config.sys` contains the parameters needed for initializing the OS. 
+  See [computer.cpp](computer.cpp) and [printer.cpp](printer.cpp) for more info on each parameter.
+  Currently, `config.sys` is set to default values that will allow most programs to execute.
+- The idle program is in `prog-idle.txt`. This ensures the CPU maintains operation even when no user processes are available.
+  **Note that if you change this program, your new program must be an infinite loop.** 
 
 
 ````
@@ -40,7 +58,7 @@ If not, expect an error.
         ├── printer.cpp
         ├── scheduler.cpp
         ├── shell.cpp
-        ├── config.txt
+        ├── config.sys
         ├── computer/
         │   ├── computer.h
         │   └── print.h

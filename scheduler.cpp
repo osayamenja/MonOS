@@ -17,7 +17,7 @@
 std::unordered_map<int, PCB> PCBs;
 int initial_PID;
 PCB idle_prog;
-int idle_prog_PID = 1;
+int idle_prog_PID = 0;
 PCB running_pcb;
 int current_mem_instr_time;
 MemoryMetadata current_process_metadata;
@@ -121,7 +121,7 @@ void process_scheduler_init() {
 
     current_mem_instr_time = 0;
     process_init_PCBs();
-    initial_PID = 2;
+    initial_PID = 1;
 
     current_process_metadata = idle_prog.metadata;
     running_pcb = PCB();
@@ -180,7 +180,6 @@ void process_execute(){
                     process_context_switch(running_pcb, ready_pcb);
                 }
                 else if(running_pcb != idle_prog){ // Continue executing the user's program since the RQ is empty.
-                    //display_process_continuation_msg(running_pcb.PID, running_pcb.file_name);
                     running_pcb.priority = std::min((rq_levels - 1), (running_pcb.priority + 1));
                 }
                 break;
@@ -190,9 +189,6 @@ void process_execute(){
                 PCB ready_pcb = process_fetch_readyQ();
                 if(ready_pcb != idle_prog){
                     process_context_switch(running_pcb, ready_pcb);
-                }
-                else if(running_pcb != idle_prog){
-                    //display_process_continuation_msg(running_pcb.PID, running_pcb.file_name);
                 }
                 break;
             }
